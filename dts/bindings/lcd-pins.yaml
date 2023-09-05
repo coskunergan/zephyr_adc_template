@@ -1,0 +1,11 @@
+
+description: GPIO pin to switch a lcd-pins
+
+compatible: "lcd-pins"
+
+properties:
+  gpios:
+    type: phandle-array
+    required: true
+    description: |
+      The GPIO connected to the LCD pins

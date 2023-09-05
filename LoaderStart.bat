@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\SEGGER\\JLink_V620c\JLink.exe" -if SWD -speed 4000 -autoconnect 1 -CommanderScript flashonly.jlink 
