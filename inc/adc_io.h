@@ -142,10 +142,13 @@ namespace device_adc
             {
                 context->done_cb(context->self->channel_index - 1, context->sample[context->self->channel_index - 1]);
             }
-            context->self->sequence.channels = BIT(adc_channels[context->self->channel_index].channel_cfg.channel_id);
-            context->self->sequence.resolution = adc_channels[context->self->channel_index].resolution;
-            int res = adc_read_async(adc_channels[context->self->channel_index].dev, &context->self->sequence, nullptr);
-            assert(res == 0);
+            if(context->self->channel_count > 1)
+            {
+                context->self->sequence.channels = BIT(adc_channels[context->self->channel_index].channel_cfg.channel_id);
+                context->self->sequence.resolution = adc_channels[context->self->channel_index].resolution;
+                int res = adc_read_async(adc_channels[context->self->channel_index].dev, &context->self->sequence, nullptr);
+                assert(res == 0);
+            }
         }
 
         static enum adc_action _hard_isr(const struct device *,
@@ -156,7 +159,12 @@ namespace device_adc
             context->sample[context->self->channel_index] = context->buffer;
             if(context->state != ADC_ACTION_FINISH)
             {
-                if(++context->self->channel_index < context->self->channel_count)
+                if(context->self->channel_count == 1)
+                {
+                    context->state = ADC_ACTION_REPEAT;
+                    k_work_submit(&context->work);
+                }
+                else if(++context->self->channel_index < context->self->channel_count)
                 {
                     context->state = ADC_ACTION_CONTINUE;
                     k_work_submit(&context->work);
