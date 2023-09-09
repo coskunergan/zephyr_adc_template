@@ -1,7 +1,6 @@
-
-#include "stm32l1_overlay.dtsi"
-
-/ {	
+#include "stm32h7_overlay.dtsi"
+	
+ / {	
 	lcd_bl: lcd_bl {			
 		compatible = "lcd-pins";
 		gpios = <&gpiob 0 GPIO_ACTIVE_LOW>;	
@@ -28,41 +27,44 @@
 	};			
 	zephyr,user {
 		/* adjust channel number according to pinmux in board.dts */
-		io-channels = <&adc1 6>, <&adc1 7>, <&adc1 10>;
-		io-channel-names = "ADC_Volt", "ADC_Rms", "ADC_Raw";
+		io-channels = <&adc1 3>, <&adc1 15>;
+		io-channel-names = "ADC_VR", "ADC_VS";
 	};		
 };
 
 &adc1 {
+	dmas = < &dmamux1 0 9 (STM32_DMA_PERIPH_TO_MEMORY |
+		STM32_DMA_MEM_INC |  STM32_DMA_MEM_16BITS | STM32_DMA_PERIPH_16BITS) >;
+	dma-names = "dmamux";
 
 	#address-cells = <1>;
 	#size-cells = <0>;
- 
-	channel@6 {
-		reg = <6>;
+
+	channel@3 {
+		reg = <3>;
 		zephyr,gain = "ADC_GAIN_1";
 		zephyr,reference = "ADC_REF_INTERNAL";
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,resolution = <12>;
 	};
-	channel@7 {
-		reg = <7>;
+	channel@15 {
+		reg = <15>;
 		zephyr,gain = "ADC_GAIN_1";
 		zephyr,reference = "ADC_REF_INTERNAL";
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,resolution = <12>;
 	};
-	channel@10 {
-		reg = <10>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
-		zephyr,resolution = <12>;
-	};
+};
+
+/* ADC driver expects a buffer in a non-cachable memory region */
+&sram4 {
+	zephyr,memory-region-mpu = "RAM_NOCACHE";
 };
 
 &dma1 {
 	status = "okay";
 };
 
-
+test_dma: &dmamux1 {
+	status = "okay";
+};

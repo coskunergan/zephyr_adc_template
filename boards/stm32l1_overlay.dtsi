@@ -1,0 +1,8 @@
+
+&adc1 {
+	pinctrl-0 = <&adc_in6_pa6 &adc_in7_pa7 &adc_in10_pc0>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+

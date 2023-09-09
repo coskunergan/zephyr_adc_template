@@ -5,6 +5,8 @@
    "AppUnderDev": "${workspaceRoot}"
    },
 "bsp": {
+   //"board": "nucleo_h743zi",
+   //"board": "stm32f4_disco",
    "board": "stm32l1_disco",
  },
 "app": {
@@ -62,4 +64,5 @@
       "cinttypes": "cpp",
       "typeinfo": "cpp"
    },
+   "cortex-debug.variableUseNaturalFormat": true,
 }

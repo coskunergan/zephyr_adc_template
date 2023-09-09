@@ -1,5 +1,5 @@
 
-#include "adc_overlay.dtsi"
+#include "stm32f4_overlay.dtsi"
 
 / {			
 	lcd_bl: lcd_bl {			
@@ -28,22 +28,15 @@
 	};			
 	zephyr,user {
 		/* adjust channel number according to pinmux in board.dts */
-		io-channels = <&adc1 10>, <&adc1 6>, <&adc1 7>;
-		io-channel-names = "ADC_VR", "ADC_VS", "ADC_VT";
+		io-channels = <&adc1 6>, <&adc1 7>, <&adc1 10>;
+		io-channel-names = "ADC_Volt", "ADC_Rms", "ADC_Raw";
 	};		
 };
 
 &adc1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
- 
-	channel@10 {
-		reg = <10>;
-		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
-		zephyr,resolution = <12>;
-	};
+
 	channel@6 {
 		reg = <6>;
 		zephyr,gain = "ADC_GAIN_1";
@@ -58,4 +51,15 @@
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,resolution = <12>;
 	};
+	channel@10 {
+		reg = <10>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};	
+};
+
+&dma1 {
+	status = "okay";
 };

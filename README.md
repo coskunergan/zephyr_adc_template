@@ -1,8 +1,8 @@
-# ZephyrRTOS Workspace Application Template ::ZPP C++20 API
+# ZephyrRTOS ADC Workspace Application Template ::ZPP C++20 API
 
 ![alt text](doc/img_logo.png)
 
-This repositories on the hardware independent zephyr rtos project, one of the popular topics of recent years. It is also a new proof that embedded systems can meet the needs of C++. My workspace uses ZephyrRTOS and ZPP C++20 API. It is where you can start from basic hardware and run advanced 3rd party applications.  
+This repositories has been prepared to be an example of the effective use of ADC hardware with ZephyrRTOS. Based on C++20, it allows ADC sampling of one or more channels with the help of DMA without task blocking. easily configure analog inputs via .dtsi and .overlay files. 
 
 Must install the ZPP module under the zephyr folder before compiling.
 
