@@ -134,14 +134,6 @@ namespace device_adc
         static void _soft_isr(struct k_work *work)
         {
             IsrContext *context = CONTAINER_OF(work, IsrContext, work);
-            if(context->self->channel_index == 0)
-            {
-                context->done_cb(context->self->channel_count - 1, context->sample[context->self->channel_count - 1]);
-            }
-            else
-            {
-                context->done_cb(context->self->channel_index - 1, context->sample[context->self->channel_index - 1]);
-            }
             if(context->self->channel_count > 1)
             {
                 context->self->sequence.channels = BIT(adc_channels[context->self->channel_index].channel_cfg.channel_id);
@@ -149,6 +141,17 @@ namespace device_adc
                 int res = adc_read_async(adc_channels[context->self->channel_index].dev, &context->self->sequence, nullptr);
                 assert(res == 0);
             }
+            if(context->done_cb)
+            {
+                if(context->self->channel_index == 0)
+                {
+                    context->done_cb(context->self->channel_count - 1, context->sample[context->self->channel_count - 1]);
+                }
+                else
+                {
+                    context->done_cb(context->self->channel_index - 1, context->sample[context->self->channel_index - 1]);
+                }
+            }            
         }
 
         static enum adc_action _hard_isr(const struct device *,

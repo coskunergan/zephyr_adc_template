@@ -1,4 +1,4 @@
-# ZephyrRTOS ADC Workspace Application Template ::ZPP C++20 API
+# ZephyrRTOS Non-Block Task ADC Template C++20 
 
 ![alt text](doc/img_logo.png)
 
