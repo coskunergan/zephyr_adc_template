@@ -52,6 +52,7 @@ namespace device_adc
             int16_t buffer;
             int16_t sample[ARRAY_SIZE(adc_channels)];
             std::function<void(size_t, int16_t)> done_cb;
+            std::function<void(size_t, int16_t)> done_cb_isr;
             enum adc_action state;
             ADC *self;
         } isrContext;
@@ -91,6 +92,31 @@ namespace device_adc
             isrContext.self = this;
             channel_index = 0;
             isrContext.done_cb = std::move(handler);
+            isrContext.state = ADC_ACTION_CONTINUE;
+            int res = adc_read_async(adc_channels[0].dev, &sequence, nullptr);
+            assert(res == 0);
+        }
+
+        virtual void readAsyncISR(microseconds us, std::function<void(size_t, int16_t)> &&handler = nullptr)
+        {
+            options =
+            {
+                .interval_us = (uint32_t)us.count(),
+                .callback = _hard_isr,
+                .user_data = &isrContext,
+            };
+            sequence =
+            {
+                .options = &options,
+                .channels = BIT(adc_channels[0].channel_cfg.channel_id),
+                .buffer = &isrContext.buffer,
+                .buffer_size = sizeof(isrContext.buffer),
+                .resolution = adc_channels[0].resolution,
+            };
+            isrContext.self = this;
+            channel_index = 0;
+            isrContext.done_cb = nullptr;
+            isrContext.done_cb_isr = std::move(handler);
             isrContext.state = ADC_ACTION_CONTINUE;
             int res = adc_read_async(adc_channels[0].dev, &sequence, nullptr);
             assert(res == 0);
@@ -151,7 +177,7 @@ namespace device_adc
                 {
                     context->done_cb(context->self->channel_index - 1, context->sample[context->self->channel_index - 1]);
                 }
-            }            
+            }
         }
 
         static enum adc_action _hard_isr(const struct device *,
@@ -165,12 +191,26 @@ namespace device_adc
                 if(context->self->channel_count == 1)
                 {
                     context->state = ADC_ACTION_REPEAT;
-                    k_work_submit(&context->work);
+                    if(context->done_cb_isr)
+                    {
+                        context->done_cb_isr(0, context->sample[0]);
+                    }
+                    else
+                    {
+                        k_work_submit(&context->work);
+                    }
                 }
                 else if(++context->self->channel_index < context->self->channel_count)
                 {
                     context->state = ADC_ACTION_CONTINUE;
-                    k_work_submit(&context->work);
+                    if(context->done_cb_isr)
+                    {
+                        context->done_cb_isr(context->self->channel_index - 1, context->sample[context->self->channel_index - 1]);
+                    }
+                    else
+                    {
+                        k_work_submit(&context->work);
+                    }
                 }
                 else
                 {
@@ -183,7 +223,14 @@ namespace device_adc
                     {
                         context->state = ADC_ACTION_CONTINUE;
                         context->self->channel_index = 0;
-                        k_work_submit(&context->work);
+                        if(context->done_cb_isr)
+                        {
+                            context->done_cb_isr(context->self->channel_count - 1, context->sample[context->self->channel_count - 1]);
+                        }
+                        else
+                        {
+                            k_work_submit(&context->work);
+                        }
                     }
                 }
             }
