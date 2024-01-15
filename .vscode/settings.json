@@ -6,8 +6,8 @@
    },
 "bsp": {
    //"board": "nucleo_h743zi",
-   //"board": "stm32f4_disco",
-   "board": "stm32l1_disco",
+   "board": "stm32f4_disco",
+   //"board": "stm32l1_disco",
  },
 "app": {
    "name": "${config:workspaceFolder.AppUnderDev}",

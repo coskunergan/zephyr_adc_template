@@ -2,6 +2,7 @@
 &adc1 {
 	pinctrl-0 = <&adc1_inp3_pa6 &adc1_inp15_pa3>;
 	pinctrl-names = "default";
+	st,adc-prescaler = <2>;
 	status = "okay";
 };
 
