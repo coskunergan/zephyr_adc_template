@@ -5,7 +5,9 @@ manifest:
   remotes:
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
-
+    - name: zpp_remote
+      url-base: https://github.com/lowlander  
+      
   projects:
     - name: zephyr
       remote: zephyrproject-rtos
@@ -15,3 +17,7 @@ manifest:
         name-allowlist:
           - cmsis
           - hal_stm32
+    - name: zpp
+      remote: zpp_remote
+      revision: master
+      path: modules/zpp   
